@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krishsiri: Smart Crop Recommendation & Disease Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Google Translate Widget Styling - FIXED */
+    #google_translate_element {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 1000;
+      background: linear-gradient(135deg, #fef3c7 0%, #ecfdf3 50%, #e0f2fe 100%);
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
+      padding: 5px;
+    }
+    
+    /* IMPORTANT: Remove all font-size: 0 rules that hide the widget */
+    .goog-te-gadget {
+      font-family: inherit !important;
+      font-size: 12px !important; /* Ensure text is visible */
+    }
+    
+    .goog-te-gadget .goog-te-combo {
+      margin: 0;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      background: #f9fafb;
+      color: #111827;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      min-width: 140px;
+    }
+    
+    /* Show the language text */
+    .goog-te-gadget span {
+      display: inline !important;
+      color: #111827 !important;
+    }
+    
+    .goog-logo-link {
+      display: none !important;
+    }
+    
+    .goog-te-banner-frame {
+      display: none !important;
+    }
+    
+    body {
+      top: 0 !important;
+    }
+    
+    .skiptranslate iframe {
+      display: none !important;
+    }
+    
+    .goog-te-menu-value span {
+      color: #111827 !important;
+    }
+    
+    .goog-te-menu2 {
+      max-width: 100% !important;
+      overflow: auto !important;
+    }
+
+    /* Global styles – ENHANCED COLOR SCHEME */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      /* Single background image */
+      background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed;
+      color: #111827;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    /* NAVBAR – enhanced with gradient */
+    nav {
+      background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+      color: white;
+      padding: 15px 0;
+      box-shadow: 0 2px 15px rgba(15, 23, 42, 0.3);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .logo i {
+      margin-right: 10px;
+      font-size: 1.8rem;
+      color: #38bdf8;
+    }
+    
+    .nav-links {
+      display: flex;
+    }
+    
+    .nav-links a {
+      color: #e5e7eb;
+      text-decoration: none;
+      margin-left: 25px;
+      font-weight: 500;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .nav-links a:hover {
+      color: #38bdf8;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #38bdf8;
+      transition: width 0.3s;
+    }
+    
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    /* HEADER – enhanced with better gradient */
+    header {
+      background: linear-gradient(
+                  135deg,
+                  rgba(15, 23, 42, 0.85), 
+                  rgba(30, 64, 175, 0.8)
+                ),
+                url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-align: center;
+      padding: 150px 20px 80px;
+      margin-bottom: 40px;
+    }
+    
+    .header-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .header-content p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      color: #e5e7eb;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #f9fafb;
+      padding: 12px 30px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      border: none;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* CARDS - Enhanced with gradients and better colors */
+    .card {
+      background: linear-gradient(135deg, #fdfcfb 0%, #ecfdf3 50%, #e0f2fe 100%);
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    }
+    
+    .section-icon {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      text-align: center;
+      background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: #111827;
+      text-align: center;
+      background: linear-gradient(135deg, #111827 0%, #374151 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .card p {
+      color: #4b5563;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .features-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .feature-card {
+      background: linear-gradient(135deg, #ecfdf3 0%, #e0f2fe 100%);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      flex: 1;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .feature-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: #111827;
+    }
+    
+    .feature-card p {
+      color: #4b5563;
+    }
+    
+    .recommendation-form {
+      margin-top: 30px;
+      background: linear-gradient(135deg, #ffffff 0%, #ecfdf3 50%, #e0f2fe 100%);
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      flex: 1;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 100%);
+      color: #111827;
+      transition: all 0.3s;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      background: #ffffff;
+    }
+    
+    .submit-btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+      color: #f9fafb;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3);
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4);
+    }
+    
+    #recommendation-result {
+      display: none;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+    }
+    
+    #recommendation-result h3 {
+      margin-bottom: 15px;
+      color: #1d4ed8;
+    }
+    
+    /* Section header for disease part – enhanced */
+    .section-header {
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(
+                  135deg,
+                  rgba(15, 23, 42, 0.85), 
+                  rgba(30, 64, 175, 0.8)
+                ),
+                url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+    
+    .section-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .section-header p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      color: #e5e7eb;
+    }
+    
+    .card ol, .card ul {
+      padding-left: 20px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    .card li {
+      margin-bottom: 10px;
+      color: #4b5563;
+      padding-left: 5px;
+    }
+    
+    .card li strong {
+      color: #111827;
+    }
+    
+    .faq-list {
+      margin-top: 30px;
+    }
+    
+    .faq-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 15px 0;
+      transition: background-color 0.3s;
+      border-radius: 6px;
+      padding: 15px;
+    }
+    
+    .faq-item:hover {
+      background-color: #f8fafc;
+    }
+    
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .faq-question i {
+      color: #6b7280;
+      transition: transform 0.3s;
+    }
+    
+    .faq-item.active .faq-question i {
+      transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+      display: none;
+      padding-top: 10px;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+    
+    .faq-item.active .faq-answer {
+      display: block;
+    }
+    
+    footer {
+      background: linear-gradient(135deg, #020617 0%, #111827 100%);
+      color: white;
+      padding: 40px 0 20px;
+      margin-top: 40px;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      gap: 30px;
+    }
+    
+    .footer-section {
+      flex: 1;
+    }
+    
+    .footer-section h3 {
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      color: #e5e7eb;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .footer-section h3::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: #38bdf8;
+    }
+    
+    .footer-section p, .footer-section a {
+      color: #9ca3af;
+      margin-bottom: 10px;
+      display: block;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+    
+    .footer-section a:hover {
+      color: #38bdf8;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, rgba(148, 163, 184, 0.2) 0%, rgba(148, 163, 184, 0.3) 100%);
+      border-radius: 50%;
+      transition: all 0.3s;
+      color: #e5e7eb;
+    }
+    
+    .social-links a:hover {
+      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3);
+    }
+    
+    .copyright {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #1f2937;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      }
+      
+      .nav-links.active {
+        display: flex;
+      }
+      
+      .nav-links a {
+        margin: 10px 0;
+        padding: 10px 0;
+      }
+      
+      .mobile-menu-btn {
+        display: block;
+      }
+      
+      .features-grid, .form-row, .footer-content {
+        flex-direction: column;
+      }
+      
+      .header-content h1, .section-header h1 {
+        font-size: 2rem;
+      }
+      
+      #google_translate_element {
+        top: 70px;
+        right: 10px;
+      }
+      
+      .goog-te-menu-frame {
+        max-width: 200px !important;
+      }
+
+      body {
+        background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80') center/cover no-repeat fixed;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Google Translate Element -->
+  <div id="google_translate_element"></div>
+  
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <i class="fas fa-seedling"></i>
+        <span>Krishsiri</span>
+      </div>
+      <div class="nav-links">
+        <a href="#crop-recommendation">Crop Recommendation</a>
+        <a href="#disease-detection-header">Disease Detection</a>
+        <a href="#explore-crops">Crop Database</a>
+        <a href="#about-project">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <header>
+    <div class="header-content">
+      <h1>Krishsiri: SMART CROP RECOMMENDATION</h1>
+      <p>Empowering farmers with AI-driven agricultural insights for better yields and sustainable farming</p>
+      <a href="#crop-recommendation" class="cta-button">Get Crop Recommendation</a>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Key Features Section -->
+    <section class="card">
+      <div class="section-icon">🚀</div>
+      <h2>Why Choose Krishsiri?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h3>AI-Powered Insights</h3>
+          <p>Our advanced machine learning algorithms analyze multiple factors to provide accurate crop recommendations.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3>Mobile Friendly</h3>
+          <p>Access Krishsiri on any device - smartphone, tablet, or computer - right in the field.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-globe"></i>
+          </div>
+          <h3>Multi-Language Support</h3>
+          <p>Available in multiple languages to serve farmers across different regions and cultures.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="model-intro" class="card">
+      <div class="section-icon">🌱</div>
+      <h2>Smart Crop Recommendation</h2>
+      <p>Our crop recommendation model leverages machine learning to analyze key factors such as soil nutrients, weather conditions, and rainfall.</p>
+    </section>
+    
+    <!-- Crop Recommendation Form -->
+    <section id="crop-recommendation" class="card">
+      <div class="section-icon">📝</div>
+      <h2>Get Personalized Crop Recommendation</h2>
+      <p>Fill in your farm details below to receive AI-powered crop suggestions tailored to your conditions.</p>
+      
+      <div class="recommendation-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nitrogen">Nitrogen Level (ppm)</label>
+            <input type="number" id="nitrogen" min="0" max="200" placeholder="e.g., 80">
+          </div>
+          <div class="form-group">
+            <label for="phosphorus">Phosphorus Level (ppm)</label>
+            <input type="number" id="phosphorus" min="0" max="200" placeholder="e.g., 40">
+          </div>
+          <div class="form-group">
+            <label for="potassium">Potassium Level (ppm)</label>
+            <input type="number" id="potassium" min="0" max="200" placeholder="e.g., 40">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="temperature">Average Temperature (°C)</label>
+            <input type="number" id="temperature" min="-10" max="50" placeholder="e.g., 25">
+          </div>
+          <div class="form-group">
+            <label for="humidity">Average Humidity (%)</label>
+            <input type="number" id="humidity" min="0" max="100" placeholder="e.g., 70">
+          </div>
+          <div class="form-group">
+            <label for="ph">Soil pH</label>
+            <input type="number" id="ph" min="0" max="14" step="0.1" placeholder="e.g., 6.5">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="rainfall">Annual Rainfall (mm)</label>
+            <input type="number" id="rainfall" min="0" max="5000" placeholder="e.g., 150">
+          </div>
+          <div class="form-group">
+            <label for="region">Geographical Region</label>
+            <select id="region">
+              <option value="">Select Region</option>
+              <option value="tropical">Tropical</option>
+              <option value="subtropical">Subtropical</option>
+              <option value="temperate">Temperate</option>
+              <option value="arid">Arid</option>
+              <option value="mediterranean">Mediterranean</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="soil-type">Soil Type</label>
+            <select id="soil-type">
+              <option value="">Select Soil Type</option>
+              <option value="clay">Clay</option>
+              <option value="sandy">Sandy</option>
+              <option value="loamy">Loamy</option>
+              <option value="silty">Silty</option>
+              <option value="peaty">Peaty</option>
+              <option value="chalky">Chalky</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="submit-btn" id="get-recommendation">Get Recommendation</button>
+        
+        <div id="recommendation-result">
+          <h3>Recommended Crops</h3>
+          <div id="recommended-crops"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="explore-crops" class="card">
+      <div class="section-icon">🔍</div>
+      <h2>Explore Optimal Crops</h2>
+      <p>Discover the ideal crops for your land by exploring the average conditions required for each crop. Our model takes into account nitrogen, phosphorus, potassium levels, temperature, humidity, pH, and rainfall to suggest the most suitable crops.</p>
+    </section>
+
+    <section id="crop-recommendation-how-it-works" class="card">
+      <div class="section-icon">🔄</div>
+      <h2>How Crop Recommendation Works</h2>
+      <ol>
+        <li><strong>Data Input:</strong> Enter land and soil details</li>
+        <li><strong>Model Analysis:</strong> ML predicts best crops</li>
+        <li><strong>Recommendation:</strong> You get top crop list</li>
+        <li><strong>Implementation:</strong> Apply & monitor</li>
+      </ol>
+    </section>
+  </main>
+
+  <section id="disease-detection-header" class="section-header">
+    <h1>Krishsiri: SMART DISEASE DETECTION</h1>
+    <p>Protect crops with advanced AI recognition</p>
+  </section>
+
+  <section id="smart-disease-detection-intro" class="card">
+    <div class="section-icon">🛡️</div>
+    <p>Our mission is to help in identifying plant diseases efficiently. Upload an image of a plant, and our system will analyze it to detect any signs of diseases. Together, let's protect our crops and ensure a healthier harvest!</p>
+  </section>
+
+  <section id="smart-disease-detection-process" class="card">
+    <div class="section-icon">🔬</div>
+    <h2>How Disease Detection Works</h2>
+    <ol>
+      <li><strong>Upload Image:</strong> Go to the <strong>Disease Recognition</strong> page and upload an image of a plant with suspected diseases.</li>
+      <li><strong>Analysis:</strong> Our system will process the image using advanced algorithms to identify potential diseases.</li>
+      <li><strong>Results:</strong> View the results and recommendations for further action.</li>
+      <li><strong>Treatment Guidance:</strong> Receive specific treatment recommendations based on the identified disease.</li>
+    </ol>
+  </section>
+
+  <section id="smart-disease-detection-benefits" class="card">
+    <div class="section-icon">⭐</div>
+    <h2>Why Choose Us?</h2>
+    <ul>
+      <li><strong>Accuracy:</strong> Our system utilizes state-of-the-art machine learning techniques for accurate disease detection.</li>
+      <li><strong>User-Friendly:</strong> Simple and intuitive interface for seamless user experience.</li>
+      <li><strong>Fast and Efficient:</strong> Receive results in seconds, allowing for quick decision-making.</li>
+      <li><strong>Comprehensive Database:</strong> Access information on hundreds of plant diseases and treatments.</li>
+      <li><strong>Preventive Alerts:</strong> Get alerts about disease outbreaks in your region.</li>
+    </ul>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="card">
+    <div class="section-icon">❓</div>
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-question">
+          How accurate are the crop recommendations?
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Our crop recommendations are based on analysis of thousands of data points and have an accuracy rate of over 92%. However, local conditions and microclimates can vary, so we recommend consulting with local agricultural experts for final decisions.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          Is my data secure with Krishsiri?
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Yes, we take data privacy seriously. All your farm data is encrypted and stored securely. We never share your personal information with third parties without your consent.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          Can I use Krishsiri on my mobile phone?
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Absolutely! Krishsiri is fully responsive and works perfectly on smartphones, tablets, and computers. You can access all features directly from your mobile browser.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          How often is the crop database updated?
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          We update our crop database quarterly with the latest agricultural research and real-world farming data. Our machine learning models are continuously refined to improve accuracy.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about-project" class="card">
+    <div class="section-icon">ℹ️</div>
+    <h2>About</h2>
+    <p>Krishsiri was developed by us to make advanced farming technology accessible to all farmers, regardless of scale or location.</p>
+    <p>This dataset is recreated using offline augmentation from the original dataset. The original dataset can be found on this GitHub repo.</p>
+    <h3>Content</h3>
+    <ul>
+      <li>train</li>
+      <li>test</li>
+      <li>validation</li>
+    </ul>
+  </section>
+
+  <footer id="contact">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Krishsiri</h3>
+        <p>Empowering farmers with AI-driven insights for sustainable agriculture and improved food security.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <a href="#crop-recommendation">Crop Recommendation</a>
+        <a href="#disease-detection-header">Disease Detection</a>
+        <a href="#explore-crops">Crop Database</a>
+        <a href="#about-project">About Us</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-section">
+        <h3>Contact Us</h3>
+        <p><i class="fas fa-map-marker-alt"></i> Government Engineering College,Talakala,Koppal</p>
+        <p><i class="fas fa-phone"></i> 9035580041</p>
+        <p><i class="fas fa-envelope"></i>infok@rishsiri.com</p>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 Krishsiri. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Google Translate Script - FIXED -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,kn,ta,te,mr,bn,ml,gu,pa,ur,as,or,sa,sd,ne,si,fa,ar,fr,es,pt,ru,zh,ja,ko,de,it,tr,nl,pl,sv,fi,no,da,cs,ro,hu,uk,id,ms,vi,th,sw',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <script>
+    // FAQ functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const faqItems = document.querySelectorAll('.faq-item');
+      
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        
+        question.addEventListener('click', () => {
+          faqItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+            }
+          });
+          item.classList.toggle('active');
+        });
+      });
+      
+      // Crop recommendation functionality (placeholder)
+      document.getElementById('get-recommendation').addEventListener('click', function() {
+        const resultDiv = document.getElementById('recommendation-result');
+        const cropsDiv = document.getElementById('recommended-crops');
+        
+        cropsDiv.innerHTML = `
+          <p>Based on your inputs, we recommend:</p>
+          <ul>
+            <li><strong>Rice</strong> - 85% match</li>
+            <li><strong>Wheat</strong> - 78% match</li>
+            <li><strong>Maize</strong> - 72% match</li>
+          </ul>
+          <p>These recommendations are based on analysis of soil nutrients, climate conditions, and regional suitability.</p>
+        `;
+        
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+      });
+      
+      // Mobile menu functionality
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const navLinks = document.querySelector('.nav-links');
+      
+      mobileMenuBtn.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+      });
+      
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

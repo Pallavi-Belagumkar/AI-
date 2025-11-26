@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KrishiSiri - Smart Agriculture Assistant</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { 
+    margin:0; 
+    padding:0; 
+    box-sizing:border-box; 
+    font-family:"Poppins", sans-serif; 
+  }
+  
+  html, body { 
+    width:100%; 
+    overflow-x:hidden; 
+    background:#f8f9fa; 
+    color:#333; 
+    scroll-behavior:smooth;
+  }
+
+  a { 
+    text-decoration:none; 
+    transition:0.3s; 
+  }
+  
+  a:hover { 
+    color:#ffd60a; 
+  }
+
+  img { 
+    max-width:100%; 
+    display:block; 
+  }
+
+  /* Google Translate Widget Styling */
+  #google_translate_element {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  .goog-te-gadget-simple {
+    border: none !important;
+    background: transparent !important;
+    font-family: "Poppins", sans-serif !important;
+  }
+  
+  .goog-te-gadget-simple .goog-te-menu-value span {
+    color: #2d6a4f !important;
+  }
+  
+  .goog-te-gadget-simple .goog-te-menu-value span:first-child {
+    display: none;
+  }
+  
+  .goog-te-gadget-simple .goog-te-menu-value span:last-child::before {
+    content: "🌐 ";
+  }
+
+  /* Hide Google Translate top bar */
+  .goog-te-banner-frame {
+    display: none !important;
+  }
+  
+  body {
+    top: 0px !important;
+  }
+
+  /* AI Voice Control Button */
+  .voice-control {
+    position: fixed;
+    top: 130px;
+    right: 20px;
+    z-index: 1001;
+  }
+  
+  .voice-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .voice-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  
+  .voice-btn.active {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    animation: pulse 1.5s infinite;
+  }
+  
+  .voice-btn i {
+    font-size: 16px;
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,107,107,0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255,107,107,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
+  }
+
+  /* AI Chatbot Styles */
+  .chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    height: 600px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 1002;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid #2d6a4f;
+  }
+
+  .chatbot-container.active {
+    display: flex;
+  }
+
+  .chatbot-header {
+    background: linear-gradient(135deg, #2d6a4f, #40916c);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .chatbot-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+  }
+
+  .chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+  }
+
+  .message {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .message.user {
+    flex-direction: row-reverse;
+  }
+
+  .message-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .message.bot .message-avatar {
+    background: #2d6a4f;
+    color: white;
+  }
+
+  .message.user .message-avatar {
+    background: #667eea;
+    color: white;
+  }
+
+  .message-content {
+    max-width: 70%;
+    padding: 12px 15px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .message.bot .message-content {
+    background: white;
+    border: 1px solid #e9ecef;
+    color: #333;
+  }
+
+  .message.user .message-content {
+    background: #667eea;
+    color: white;
+  }
+
+  .chatbot-input {
+    padding: 15px 20px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .chatbot-input input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 0.9rem;
+  }
+
+  .chatbot-input input:focus {
+    border-color: #2d6a4f;
+  }
+
+  .chatbot-input button {
+    background: #2d6a4f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .chatbot-input button:hover {
+    background: #40916c;
+    transform: scale(1.05);
+  }
+
+  .chatbot-tools {
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .tool-btn {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .tool-btn:hover {
+    background: #2d6a4f;
+    color: white;
+    border-color: #2d6a4f;
+  }
+
+  .tool-btn.active {
+    background: #2d6a4f;
+    color: white;
+    border-color: #2d6a4f;
+  }
+
+  .uploaded-image {
+    max-width: 200px;
+    border-radius: 10px;
+    margin-top: 5px;
+    border: 2px solid #e9ecef;
+  }
+
+  .chatbot-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #2d6a4f, #40916c);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1001;
+    transition: all 0.3s ease;
+  }
+
+  .chatbot-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  .file-input {
+    display: none;
+  }
+
+  /* Navbar */
+  .header { 
+    position:fixed; 
+    top:0; 
+    width:100%; 
+    background-color:rgba(45,106,79,0.95); 
+    color:white; 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    padding:12px 5%; 
+    z-index:1000; 
+    backdrop-filter:blur(6px); 
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+  }
+  
+  .logo { 
+    display: flex; 
+    align-items: center; 
+  }
+  
+  .logo h1 { 
+    font-size:1.6rem; 
+    color:#f4fce3; 
+    display:flex; 
+    align-items:center; 
+  }
+  
+  .logo img { 
+    height:45px; 
+    margin-right:10px; 
+    border-radius:50%; 
+  }
+  
+  .navbar { 
+    display: flex; 
+    align-items: center; 
+  }
+  
+  .navbar a { 
+    color:#fff; 
+    margin:0 10px; 
+    font-weight:500; 
+    font-size:0.95rem; 
+    position: relative;
+  }
+  
+  .navbar a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #ffd60a;
+    transition: width 0.3s ease;
+  }
+  
+  .navbar a:hover::after {
+    width: 100%;
+  }
+  
+  .navbar .btn { 
+    background-color:#52b788; 
+    padding:6px 12px; 
+    border-radius:6px; 
+    font-weight:600; 
+    font-size:0.9rem; 
+  }
+  
+  .navbar .btn:hover { 
+    background-color:#40916c; 
+  }
+  
+  #menu-btn {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  /* Home - Updated Background Image */
+  .home { 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    min-height:100vh; 
+    padding:100px 5% 80px; 
+    background:linear-gradient(rgba(5, 125, 49, 0.1), rgba(29, 198, 10, 0.029)), 
+               url('https://img.freepik.com/premium-photo/beautiful-sunset-green-field-with-tree-foreground_924629-12969.jpg') center/cover no-repeat; 
+    color:#fff; 
+    text-shadow:1px 1px 4px rgba(0,0,0,0.6); 
+    flex-direction:column; 
+    text-align:center; 
+    position: relative;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .home::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(45,106,79,0.3), rgba(168,218,220,0.3));
+    z-index: -1;
+  }
+  
+  .home h1 { 
+    font-size:2.8rem; 
+    margin-bottom:10px; 
+    color:#f1faee; 
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+  }
+  
+  .home p { 
+    font-size:1.2rem; 
+    margin-bottom:20px; 
+    color:#f8f9fa; 
+  }
+  
+  .home-btn { 
+    background-color:#2d6a4f; 
+    color:#fff; 
+    padding:16px 32px; 
+    border-radius:8px; 
+    font-weight:600; 
+    font-size:1.1rem;
+    transition:0.3s; 
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    display: inline-block;
+    margin: 8px;
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    min-width: 220px;
+  }
+  
+  .home-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+  }
+  
+  .home-btn:hover::before {
+    left: 100%;
+  }
+  
+  .home-btn:hover { 
+    background-color:#74c69d; 
+    transform:translateY(-3px); 
+  }
+
+  /* Farming Words Section - Improved Card Sizes */
+  .farming-words {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+  }
+  
+  .word-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    min-width: 200px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    max-width: 250px;
+  }
+  
+  .word-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #52b788, #2d6a4f);
+  }
+  
+  .word-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .word-card i {
+    font-size: 2.5rem;
+    color: #2d6a4f;
+    margin-bottom: 15px;
+  }
+  
+  .word-card h4 {
+    margin-bottom: 15px;
+    color: #2d6a4f;
+    font-size: 1.3rem;
+  }
+  
+  .word-card p {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #1b4332;
+    line-height: 1.4;
+  }
+
+  /* Features - New Background */
+  .features { 
+    padding:80px 5%; 
+    text-align:center; 
+    background:linear-gradient(rgba(51, 156, 16, 0.452), rgba(0,0,0,0.6)), 
+               url('https://thumbs.dreamstime.com/z/different-types-crops-grown-adjacent-rows-farmer-practicing-crop-rotation-sustainable-farm-where-different-types-324576474.jpg?w=992') center/cover no-repeat;
+    color:#fff; 
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .features h1 { 
+    color:#ffd60a; 
+    font-size:2rem; 
+    margin-bottom:10px; 
+  }
+  
+  .features p { 
+    margin-bottom:30px; 
+    font-size:1.1rem; 
+  }
+  
+  .buttonn { 
+    display:inline-block; 
+    margin:10px; 
+    padding:12px 20px; 
+    font-weight:600; 
+    font-size:1rem; 
+    border-radius:12px; 
+    background:linear-gradient(145deg,#52b788,#2d6a4f); 
+    color:white; 
+    box-shadow:0 8px 15px rgba(0,0,0,0.3); 
+    transition: all 0.3s ease; 
+    text-align:center; 
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .buttonn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+  }
+  
+  .buttonn:hover::before {
+    left: 100%;
+  }
+  
+  .buttonn:hover { 
+    transform:translateY(-6px) scale(1.05); 
+    box-shadow:0 15px 25px rgba(0,0,0,0.4); 
+    background:linear-gradient(145deg,#74c69d,#40916c); 
+  }
+
+  /* Crop Calendar - Redesigned */
+  .crop-calendar {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px auto;
+    max-width: 900px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  
+  .calendar-container {
+    margin-top: 20px;
+  }
+  
+  #cropSelect {
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #2d6a4f;
+    margin-bottom: 20px;
+    background: white;
+    color: #2d6a4f;
+    font-weight: 600;
+    width: 100%;
+    max-width: 300px;
+    font-size: 1rem;
+  }
+  
+  .calendar-view {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  
+  .calendar-month {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    border: 1px solid #e9ecef;
+  }
+  
+  .calendar-month.active {
+    background: #ffd60a;
+    color: #1b4332;
+    font-weight: bold;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .calendar-month.sowing {
+    background: #a7c957;
+    color: white;
+  }
+  
+  .calendar-month.harvesting {
+    background: #e76f51;
+    color: white;
+  }
+
+  /* Weather Forecast Section - New Background */
+  .weather-forecast {
+    padding: 80px 5%;
+    background:linear-gradient(rgba(5, 1, 1, 0.093), rgba(0,0,0,0.7)), 
+               url('https://tse4.mm.bing.net/th/id/OIP.tA6naA3hS2LUvi0lvbS8PgHaEH?rs=1&pid=ImgDetMain&o=7&rm=3') center/cover no-repeat;
+    color: white;
+    text-align: center;
+  }
+  
+  .weather-cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+  
+  .weather-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    color: #2d6a4f;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+  }
+  
+  .weather-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .weather-card i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+
+  /* Advantages - New Background */
+  .advantages { 
+    background:linear-gradient(rgba(0, 0, 0, 0.264), rgba(0,0,0,0.7)), 
+               url('https://thumbs.dreamstime.com/z/different-types-crops-grown-adjacent-rows-farmer-practicing-crop-rotation-sustainable-farm-where-different-types-324576474.jpg?w=992') center/cover no-repeat;
+    color:#fff; 
+    padding:80px 5%; 
+    text-align:center; 
+    position: relative;
+  }
+  
+  .advantages h1 { color:#ffd60a; font-size:2rem; margin-bottom:40px; }
+
+  .advantages .row { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 30px; 
+  }
+
+  .adv-card {
+    flex: 1 1 250px;
+    max-width: 300px;
+    background: linear-gradient(145deg,#74c69d,#52b788);
+    border-radius: 20px;
+    padding: 25px;
+    color: white;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    transition: 0.4s;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .adv-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+  }
+  
+  .adv-card:hover::before {
+    opacity: 1;
+    transform: rotate(30deg) translate(10%, 10%);
+  }
+
+  .adv-card:hover {
+    transform: translateY(-15px) rotateX(3deg) rotateY(3deg) scale(1.05);
+    box-shadow: 0 25px 40px rgba(0,0,0,0.3);
+  }
+
+  .adv-card i { font-size: 2rem; margin-bottom: 15px; }
+  .adv-card h3 { margin-bottom: 12px; font-size: 1.2rem; font-weight: 600; }
+  .adv-card p { font-size: 1rem; line-height: 1.4; }
+
+  /* About / Team - Updated to show images clearly */
+  .about { 
+    background: linear-gradient(135deg, #aaafb6ed, #34495e);
+    color:rgb(217, 224, 228); 
+    padding:80px 5%; 
+    text-align:center; 
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .about::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.discoverengineering.org/wp-content/uploads/2024/11/guides-to-master-engineering-exams.jpeg') center/cover no-repeat;
+    opacity: 0.1;
+    z-index: 0;
+  }
+  
+  .about > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .about h1 { margin-bottom:30px; font-size:2rem; color:#ffd60a; }
+  .about .box-container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
+  .about .box { 
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    color:#1b4332; 
+    border-radius:12px; 
+    padding:20px; 
+    width:250px; 
+    text-align:center; 
+    transition:0.4s; 
+    box-shadow:0 10px 20px rgb(236, 234, 244);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .about .box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #52b788, #2d6a4f);
+  }
+  
+  .about .box:hover { transform:translateY(-10px) scale(1.05); box-shadow:0 20px 30px rgba(0,0,0,0.3); }
+  .about .box img { 
+    border-radius:50%; 
+    height:120px; 
+    width:120px; 
+    object-fit:cover; 
+    margin-bottom:15px; 
+    transition:0.3s; 
+    border: 3px solid #52b788;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .about .box img:hover { transform:scale(1.1); }
+  .about .box h3 { margin-bottom:8px; }
+  .about .box p { font-size:0.9rem; color:#2d6a4f; }
+
+  /* Footer */
+  .footer { 
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+    color:rgb(230, 222, 222); 
+    padding:40px 5% 20px; 
+    text-align:center; 
+    position: relative;
+  }
+  
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://static.theprint.in/wp-content/uploads/2021/04/20200628060L-1.jpg') center/cover no-repeat;
+    opacity: 0.05;
+    z-index: 0;
+  }
+  
+  .footer > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .footer .credit { border-top:1px solid #2d6a4f; margin-top:20px; padding-top:10px; font-size:0.9rem; }
+  .footer span { color:#ffd60a; font-weight:600; }
+
+  /* Animation for elements */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeInUp {
+    animation: fadeInUp 0.8s ease forwards;
+  }
+  
+  .delay-1 { animation-delay: 0.2s; }
+  .delay-2 { animation-delay: 0.4s; }
+  .delay-3 { animation-delay: 0.6s; }
+  
+  /* Loading animation */
+  .loader {
+    display: none;
+    width: 48px;
+    height: 48px;
+    border: 5px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: rotation 1s linear infinite;
+    margin: 20px auto;
+  }
+  
+  @keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .home h1 {
+      font-size: 2.4rem;
+    }
+    
+    .calendar-view {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .voice-btn {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+    
+    .chatbot-container {
+      width: 350px;
+      height: 500px;
+    }
+  }
+  
+  @media (max-width: 768px){ 
+    .navbar { 
+      display: none; 
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: rgba(45,106,79,0.95);
+      flex-direction: column;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .navbar.active {
+      display: flex;
+    }
+    
+    .navbar a {
+      margin: 10px 0;
+      font-size: 1.1rem;
+    }
+    
+    #menu-btn { 
+      display: block; 
+      font-size: 1.5rem; 
+    } 
+    
+    .home h1 { 
+      font-size: 2rem; 
+    } 
+    
+    .home p { 
+      font-size: 1rem; 
+    } 
+    
+    .features h1, .advantages h1, .about h1 { 
+      font-size: 1.5rem; 
+    } 
+    
+    .adv-card { 
+      flex: 1 1 90%; 
+      max-width: 90%; 
+    } 
+    
+    .about .box { 
+      width: 90%; 
+    } 
+    
+    #google_translate_element {
+      top: 70px;
+      right: 10px;
+    }
+    
+    .calendar-view {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .home-btn {
+      padding: 14px 28px;
+      font-size: 1rem;
+      min-width: 200px;
+    }
+    
+    .farming-words {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .word-card {
+      width: 100%;
+      max-width: 250px;
+    }
+    
+    .voice-control {
+      top: 130px;
+      right: 15px;
+    }
+    
+    .voice-btn {
+      padding: 8px 14px;
+      font-size: 12px;
+    }
+    
+    .chatbot-container {
+      width: 320px;
+      height: 450px;
+      bottom: 10px;
+      right: 10px;
+    }
+    
+    .chatbot-toggle {
+      bottom: 10px;
+      right: 10px;
+      width: 50px;
+      height: 50px;
+      font-size: 1.3rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .home h1 {
+      font-size: 1.8rem;
+    }
+    
+    .home p {
+      font-size: 0.9rem;
+    }
+    
+    .calendar-view {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .weather-card {
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .farming-words {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .word-card {
+      width: 100%;
+      max-width: 250px;
+    }
+    
+    .home-btn {
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      min-width: 180px;
+    }
+    
+    .voice-btn {
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+    
+    .chatbot-container {
+      width: 300px;
+      height: 400px;
+    }
+    
+    .message-content {
+      max-width: 85%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- AI Chatbot Toggle Button -->
+<button class="chatbot-toggle" id="chatbotToggle">
+  <i class="fas fa-robot"></i>
+</button>
+
+<!-- AI Chatbot Container -->
+<div class="chatbot-container" id="chatbotContainer">
+  <div class="chatbot-header">
+    <h3><i class="fas fa-robot"></i> KrishiSiri AI Assistant</h3>
+    <button class="chatbot-close" id="chatbotClose">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  
+  <div class="chatbot-messages" id="chatbotMessages">
+    <div class="message bot">
+      <div class="message-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="message-content">
+        ನಮಸ್ಕಾರ! ನಾನು KrishiSiri AI ಸಹಾಯಕ. ನಿಮ್ಮ ಕೃಷಿ ಸಮಸ್ಯೆಗಳು, ಬೆಳೆ ಸಲಹೆ, ರೋಗ ನಿರ್ಣಯ, ಅಥವಾ ಹವಾಮಾನ ಮಾಹಿತಿಗಾಗಿ ನನಗೆ ಕೇಳಿ. ನೀವು ಚಿತ್ರಗಳನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಬಹುದು ಅಥವಾ ನೇರವಾಗಿ ಮಾತನಾಡಬಹುದು!
+      </div>
+    </div>
+  </div>
+  
+  <div class="chatbot-tools">
+    <button class="tool-btn" id="voiceChatBtn">
+      <i class="fas fa-microphone"></i> ಧ್ವನಿ ಚಾಟ್
+    </button>
+    <button class="tool-btn" id="uploadImageBtn">
+      <i class="fas fa-image"></i> ಚಿತ್ರ ಅಪ್ಲೋಡ್
+    </button>
+    <button class="tool-btn" id="clearChatBtn">
+      <i class="fas fa-trash"></i> ಸ್ಪಷ್ಟ ಚಾಟ್
+    </button>
+  </div>
+  
+  <div class="chatbot-input">
+    <input type="file" id="imageUpload" class="file-input" accept="image/*">
+    <input type="text" id="chatInput" placeholder="ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ...">
+    <button id="voiceInputBtn" class="chatbot-input-btn">
+      <i class="fas fa-microphone"></i>
+    </button>
+    <button id="imageInputBtn" class="chatbot-input-btn">
+      <i class="fas fa-image"></i>
+    </button>
+    <button id="sendMessageBtn">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+<!-- AI Voice Control Button -->
+<div class="voice-control">
+  <button class="voice-btn" id="voiceToggle">
+    <i class="fas fa-volume-up"></i>
+    <span id="voiceStatus">AI Voice: OFF</span>
+  </button>
+</div>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element"></div>
+
+<!-- Navbar -->
+<header class="header">
+  <div class="logo">
+    <!-- Using a placeholder image since the actual image path might not work -->
+    <div style="height:45px; width:45px; background:#52b788; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:10px; color:white;">
+      <i class="fas fa-seedling"></i>
+    </div>
+    <h1>KrishiSiri</h1>
+  </div>
+  <nav class="navbar" id="navbar">
+    <a href="#home">ಮನೆ</a>
+    <a href="#features">ವೈಶಿಷ್ಟ್ಯಗಳು</a>
+    <a href="#advantages">ಪ್ರಯೋಜನಗಳು</a>
+    <a href="#about">ನಮ್ಮ ಬಗ್ಗೆ</a>
+    <a href="#footer">ಸಂಪರ್ಕ</a>
+    <a href="explore/index.html" class="btn">ಅನುಭವಿಸಿ</a>
+  </nav>
+  <div class="fas fa-bars" id="menu-btn" onclick="toggleNavbar()"></div>
+</header>
+
+<!-- Home -->
+<section class="home" id="home">
+  <div class="content">
+    <h1 id="homeTitle" class="animate-fadeInUp">ನಿಮ್ಮ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯಕ</h1>
+    <p id="homeText" class="animate-fadeInUp delay-1">KrishiSiri ಜೊತೆ ಹಸಿರು ಕ್ರಾಂತಿಗೆ ಹೊಸ ಪ್ರಾರಂಭ!</p>
+    
+    <!-- Farming Words Cards -->
+    <div class="farming-words animate-fadeInUp delay-2">
+        <div class="word-card">
+            <i class="fas fa-seedling"></i>
+            <h4>ಬೆಳೆ ಯೋಜನೆ</h4>
+            <p>ಸರಿಯಾದ ಸಮಯದಲ್ಲಿ<br>ಸರಿಯಾದ ಬೆಳೆ</p>
+        </div>
+        <div class="word-card">
+            <i class="fas fa-tint"></i>
+            <h4>ನೀರಾವರಿ</h4>
+            <p>ನೀರಿನ ಪರಿಣಾಮಕ<br>ಬಳಕೆ</p>
+        </div>
+        <div class="word-card">
+            <i class="fas fa-leaf"></i>
+            <h4>ಸಾವಯವ ಕೃಷಿ</h4>
+            <p>ಪರಿಸರ ಸ್ನೇಹಿ<br>ಕೃಷಿ ಪದ್ಧತಿ</p>
+        </div>
+    </div>
+    
+    <div class="animate-fadeInUp delay-3">
+      <a href="guide/index.html" class="home-btn" target="_blank">ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಮಾರ್ಗದರ್ಶಿ</a>
+      <a href="explore/index.html" class="home-btn" target="_blank">ಅನ್ವೇಷಿಸಿ</a>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <h1 id="featuresTitle" class="animate-fadeInUp">ವೈಶಿಷ್ಟ್ಯಗಳು</h1>
+  <p id="featuresText" class="animate-fadeInUp delay-1">AI ಮತ್ತು ಡೇಟಾ ವಿಶ್ಲೇಷಣೆ ಆಧಾರಿತ ಕೃಷಿ ಉಪಕರಣಗಳು.</p>
+  <div class="animate-fadeInUp delay-2">
+    <a href="https://crop-recomm.streamlit.app/" class="buttonn">ಬೆಳೆ ಶಿಫಾರಸು</a>
+    <a href="https://agrisens-crop-disease-pred.streamlit.app/" class="buttonn">ಸಸ್ಯ ರೋಗ ಪತ್ತೆ</a>
+    <a href="weather-forecast/index.html" class="buttonn">ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ</a>
+    <a href="guide/index.html" class="buttonn">ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಮಾರ್ಗದರ್ಶಿ</a>
+  </div>
+  
+  <!-- Crop Calendar -->
+  <div class="crop-calendar animate-fadeInUp delay-3">
+    <h3>ಬೆಳೆ ಕ್ಯಾಲೆಂಡರ್</h3>
+    <p>ನಿಮ್ಮ ಪ್ರದೇಶಕ್ಕೆ ಅನುಕೂಲಕರ ಬೆಳೆ ಸಮಯವನ್ನು ತಿಳಿಯಿರಿ</p>
+    <div class="calendar-container">
+        <select id="cropSelect" onchange="updateCalendar()">
+            <option value="rice">ಭತ್ತ</option>
+            <option value="ragi">ರಾಗಿ</option>
+            <option value="jowar">ಜೋಳ</option>
+            <option value="maize">ಮೆಕ್ಕೆ ಜೋಳ</option>
+            <option value="sugarcane">ಕಬ್ಬು</option>
+            <option value="cotton">ಹತ್ತಿ</option>
+            <option value="groundnut">ಕಡಲೆಕಾಯಿ</option>
+            <option value="sunflower">ಸೂರ್ಯಕಾಂತಿ</option>
+            <option value="chilli">ಮೆಣಸಿನಕಾಯಿ</option>
+            <option value="turmeric">ಅರಿಶಿನ</option>
+            <option value="onion">ಈರುಳ್ಳಿ</option>
+            <option value="tomato">ಟೊಮ್ಯಾಟೊ</option>
+
+        </select>
+        <div id="calendarView" class="calendar-view">
+            <!-- Calendar will be generated by JavaScript -->
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- Weather Forecast -->
+<section class="weather-forecast" id="weather">
+  <h1 class="animate-fadeInUp">5-ದಿನದ ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ</h1>
+  <p class="animate-fadeInUp delay-1">ನಿಮ್ಮ ಪ್ರದೇಶದ ಹವಾಮಾನದ ಬಗ್ಗೆ ಮುಂಚಿತವಾಗಿ ತಿಳಿಯಿರಿ</p>
+  
+  <div class="weather-cards">
+    <div class="weather-card animate-fadeInUp delay-1">
+      <i class="fas fa-sun" style="color: #ffd60a;"></i>
+      <h4>ಇಂದು</h4>
+      <p>28°C</p>
+      <p>ಬೆಳಗಿನ ಚಳಿ</p>
+    </div>
+    <div class="weather-card animate-fadeInUp delay-2">
+      <i class="fas fa-cloud-sun" style="color: #74c69d;"></i>
+      <h4>ನಾಳೆ</h4>
+      <p>30°C</p>
+      <p>ಭಾಗಶಃ ಮೋಡ</p>
+    </div>
+    <div class="weather-card animate-fadeInUp delay-3">
+      <i class="fas fa-cloud-rain" style="color: #457b9d;"></i>
+      <h4>ನಂತರದ ದಿನ</h4>
+      <p>26°C</p>
+      <p>ಮಳೆ ಸಾಧ್ಯತೆ</p>
+    </div>
+    <div class="weather-card animate-fadeInUp delay-1">
+      <i class="fas fa-cloud" style="color: #a8dadc;"></i>
+      <h4>4ನೇ ದಿನ</h4>
+      <p>29°C</p>
+      <p>ಮೋಡ ಕವಿದ</p>
+    </div>
+    <div class="weather-card animate-fadeInUp delay-2">
+      <i class="fas fa-sun" style="color: #ffd60a;"></i>
+      <h4>5ನೇ ದಿನ</h4>
+      <p>31°C</p>
+      <p>ಬಿಸಿಲು</p>
+    </div>
+  </div>
+</section>
+
+<!-- Advantages -->
+<section class="advantages" id="advantages">
+  <h1 class="animate-fadeInUp">KrishiSiri ಪ್ರಯೋಜನಗಳು</h1>
+  <div class="row">
+    <div class="adv-card animate-fadeInUp delay-1">
+      <i class="fas fa-cloud-sun"></i>
+      <h3>ನಿಖರ ಮುನ್ಸೂಚನೆ</h3>
+      <p>ಹವಾಮಾನ ಮತ್ತು ರೋಗ ಮಾಹಿತಿ ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ.</p>
+    </div>
+    <div class="adv-card animate-fadeInUp delay-2">
+      <i class="fas fa-seedling"></i>
+      <h3>ಉತ್ಪಾದನೆ ಹೆಚ್ಚಳ</h3>
+      <p>AI ಶಿಫಾರಸುಗಳಿಂದ ಬೆಳೆ ಫಲಿತಾಂಶ ಉತ್ತಮಗೊಳಿಸಿ.</p>
+    </div>
+    <div class="adv-card animate-fadeInUp delay-3">
+      <i class="fas fa-leaf"></i>
+      <h3>ಪರಿಸರ ಸ್ನೇಹಿ</h3>
+      <p>ಸಾಧನ ಬಳಕೆಯನ್ನು ಕಡಿಮೆ ಮಾಡಿ ಮತ್ತು ತಿರುಗುಪ್ರವೃತ್ತಿ ಬೆಳೆಸಿರಿ.</p>
+    </div>
+  </div>
+</section>
+
+<!-- About / Team -->
+<section class="about" id="about">
+  <h1 class="animate-fadeInUp">ನಮ್ಮ ಬಗ್ಗೆ</h1>
+  <div class="box-container">
+    <div class="box animate-fadeInUp delay-1">
+      <!-- Placeholder image -->
+      <img src="images/pallavi.jpg" alt="Pallavi" style="height:120px; width:120px; border-radius:50%; object-fit:cover; margin:0 auto 15px; border:3px solid #52b788;">
+      <h3>ಪಲ್ಲವಿ ವಿನಾಯಕ ಬೆಲಗುಂಬ್ಕರ್</h3>
+      <p>B.E ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್</p>
+      <p>9448068525</p>
+      <p>pbelgumkar@gmail.com</p>
+      <p>github.com/pallavi</p>
+    </div>
+    <div class="box animate-fadeInUp delay-2">
+      <img src="images/megha.jpg" alt="Meghana" style="height:120px; width:120px; border-radius:50%; object-fit:cover; margin:0 auto 15px; border:3px solid #52b788;">
+      <h3>ಮೇಘನಾ ವಿ ಸ್ವಾಮಿ</h3>
+      <p>B.E ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್</p>
+      <p>9035580041</p>
+      <p>meghanaswamy13@gmail.com</p>
+      <p>https://github.com/meghana-arch</p>
+    </div>
+    <div class="box animate-fadeInUp delay-3">
+      <img src="images/triv.jpg" alt="Triveni" style="height:120px; width:120px; border-radius:50%; object-fit:cover; margin:0 auto 15px; border:3px solid #52b788;">
+      <h3>ತ್ರಿವೇಣಿ ಕಮಾರ್</h3>
+      <p>B.E ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್</p>
+      <p>9148311073</p>
+      <p>trivenikammar65@gmail.com</p>
+      <p>https://github.com/Triveni-Kammar/</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" id="footer">
+  <p>📞 ಸಂಪರ್ಕಿಸಿ: ಪಲ್ಲವಿ | ಮೇಘನಾ | ತ್ರಿವೇಣಿ</p>
+  <div class="credit">© 2025 <span>KrishiSiri</span> | ಎಲ್ಲಾ ಹಕ್ಕುಗಳು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ</div>
+</footer>
+
+<!-- Loading animation -->
+<div class="loader" id="pageLoader"></div>
+
+<script>
+// ========== AI CHATBOT FUNCTIONALITY ==========
+
+let isListening = false;
+let recognition = null;
+let voiceEnabled = false;
+
+// Initialize chatbot
+function initChatbot() {
+  const chatbotToggle = document.getElementById('chatbotToggle');
+  const chatbotContainer = document.getElementById('chatbotContainer');
+  const chatbotClose = document.getElementById('chatbotClose');
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
+  const chatInput = document.getElementById('chatInput');
+  const uploadImageBtn = document.getElementById('uploadImageBtn');
+  const imageUpload = document.getElementById('imageUpload');
+  const voiceChatBtn = document.getElementById('voiceChatBtn');
+  const clearChatBtn = document.getElementById('clearChatBtn');
+  const voiceInputBtn = document.getElementById('voiceInputBtn');
+  const imageInputBtn = document.getElementById('imageInputBtn');
+
+  // Toggle chatbot visibility
+  chatbotToggle.addEventListener('click', () => {
+    chatbotContainer.classList.toggle('active');
+  });
+
+  // Close chatbot
+  chatbotClose.addEventListener('click', () => {
+    chatbotContainer.classList.remove('active');
+  });
+
+  // Send message on button click
+  sendMessageBtn.addEventListener('click', sendMessage);
+
+  // Send message on Enter key
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
+
+  // Upload image from chatbot tools
+  uploadImageBtn.addEventListener('click', () => {
+    imageUpload.click();
+  });
+
+  imageUpload.addEventListener('change', handleImageUpload);
+
+  // Voice chat from chatbot tools
+  voiceChatBtn.addEventListener('click', toggleVoiceChat);
+
+  // Voice input from input area
+  voiceInputBtn.addEventListener('click', toggleVoiceInput);
+
+  // Image input from input area
+  imageInputBtn.addEventListener('click', () => {
+    imageUpload.click();
+  });
+
+  // Clear chat
+  clearChatBtn.addEventListener('click', clearChat);
+
+  // Initialize speech recognition
+  initSpeechRecognition();
+}
+
+// Initialize speech recognition
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'kn-IN';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+      const speechResult = event.results[0][0].transcript;
+      document.getElementById('chatInput').value = speechResult;
+      sendMessage();
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event.error);
+      addBotMessage('ಕ್ಷಮಿಸಿ, ನಾನು ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಗುರುತಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.');
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      updateVoiceButton();
+    };
+  } else {
+    console.warn('Speech recognition not supported in this browser');
+    document.getElementById('voiceChatBtn').disabled = true;
+    document.getElementById('voiceChatBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> ಧ್ವನಿ ಬೆಂಬಲಿಸುವುದಿಲ್ಲ';
+    document.getElementById('voiceInputBtn').disabled = true;
+    document.getElementById('voiceInputBtn').innerHTML = '<i class="fas fa-microphone-slash"></i>';
+  }
+}
+
+// Toggle voice chat from tools
+function toggleVoiceChat() {
+  if (!recognition) {
+    addBotMessage('ಕ್ಷಮಿಸಿ, ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಧ್ವನಿ ಗುರುತಿಸುವಿಕೆಯನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ.');
+    return;
+  }
+
+  if (isListening) {
+    recognition.stop();
+    isListening = false;
+    document.getElementById('voiceChatBtn').classList.remove('active');
+  } else {
+    recognition.start();
+    isListening = true;
+    document.getElementById('voiceChatBtn').classList.add('active');
+    addBotMessage('ನಾನು ಕೇಳುತ್ತಿದ್ದೇನೆ... ದಯವಿಟ್ಟು ಮಾತನಾಡಿ.');
+  }
+  
+  updateVoiceButton();
+}
+
+// Toggle voice input from input area
+function toggleVoiceInput() {
+  if (!recognition) {
+    addBotMessage('ಕ್ಷಮಿಸಿ, ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಧ್ವನಿ ಗುರುತಿಸುವಿಕೆಯನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ.');
+    return;
+  }
+
+  if (isListening) {
+    recognition.stop();
+    isListening = false;
+    document.getElementById('voiceInputBtn').classList.remove('active');
+  } else {
+    recognition.start();
+    isListening = true;
+    document.getElementById('voiceInputBtn').classList.add('active');
+    addBotMessage('ನಾನು ಕೇಳುತ್ತಿದ್ದೇನೆ... ದಯವಿಟ್ಟು ಮಾತನಾಡಿ.');
+  }
+  
+  updateVoiceButton();
+}
+
+// Update voice button state
+function updateVoiceButton() {
+  const voiceChatBtn = document.getElementById('voiceChatBtn');
+  const voiceInputBtn = document.getElementById('voiceInputBtn');
+  
+  if (isListening) {
+    voiceChatBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> ನಿಲ್ಲಿಸಿ';
+    voiceChatBtn.style.background = '#e74c3c';
+    voiceChatBtn.style.color = 'white';
+    
+    voiceInputBtn.style.background = '#e74c3c';
+    voiceInputBtn.style.color = 'white';
+  } else {
+    voiceChatBtn.innerHTML = '<i class="fas fa-microphone"></i> ಧ್ವನಿ ಚಾಟ್';
+    voiceChatBtn.style.background = '';
+    voiceChatBtn.style.color = '';
+    
+    voiceInputBtn.style.background = '';
+    voiceInputBtn.style.color = '';
+  }
+}
+
+// Handle image upload
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        addUserMessage('', e.target.result);
+        // Simulate AI response for image analysis
+        setTimeout(() => {
+          addBotMessage('ಧನ್ಯವಾದಗಳು! ನಾನು ಈ ಚಿತ್ರವನ್ನು ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದೇನೆ... ಇದು ಸಸ್ಯ ರೋಗದ ಲಕ್ಷಣಗಳನ್ನು ತೋರಿಸುತ್ತದೆ. ಸೂಚನೆ: ಸೂಕ್ತವಾದ ಕೀಟನಾಶಕಗಳನ್ನು ಬಳಸಿ ಮತ್ತು ಸಸ್ಯಗಳನ್ನು ನಿಯಮಿತವಾಗಿ ಪರಿಶೀಲಿಸಿ.');
+        }, 1500);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      addBotMessage('ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಚಿತ್ರ ಫೈಲ್ ಅನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ (JPG, PNG, ಇತ್ಯಾದಿ).');
+    }
+  }
+  // Reset file input
+  event.target.value = '';
+}
+
+// Send message function
+function sendMessage() {
+  const chatInput = document.getElementById('chatInput');
+  const message = chatInput.value.trim();
+  
+  if (message) {
+    addUserMessage(message);
+    chatInput.value = '';
+    
+    // Simulate AI thinking
+    setTimeout(() => {
+      generateAIResponse(message);
+    }, 1000);
+  }
+}
+
+// Add user message to chat
+function addUserMessage(message, imageUrl = null) {
+  const messagesContainer = document.getElementById('chatbotMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'message user';
+  
+  let content = `
+    <div class="message-avatar">
+      <i class="fas fa-user"></i>
+    </div>
+    <div class="message-content">
+      ${message}
+  `;
+  
+  if (imageUrl) {
+    content += `<img src="${imageUrl}" alt="Uploaded image" class="uploaded-image">`;
+  }
+  
+  content += `</div>`;
+  messageDiv.innerHTML = content;
+  messagesContainer.appendChild(messageDiv);
+  scrollToBottom();
+}
+
+// Add bot message to chat
+function addBotMessage(message) {
+  const messagesContainer = document.getElementById('chatbotMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'message bot';
+  messageDiv.innerHTML = `
+    <div class="message-avatar">
+      <i class="fas fa-robot"></i>
+    </div>
+    <div class="message-content">${message}</div>
+  `;
+  messagesContainer.appendChild(messageDiv);
+  scrollToBottom();
+  
+  // Speak the message if voice is enabled
+  if (voiceEnabled) {
+    speakText(message);
+  }
+}
+
+// Scroll to bottom of chat
+function scrollToBottom() {
+  const messagesContainer = document.getElementById('chatbotMessages');
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Clear chat history
+function clearChat() {
+  const messagesContainer = document.getElementById('chatbotMessages');
+  // Keep only the first bot message
+  while (messagesContainer.children.length > 1) {
+    messagesContainer.removeChild(messagesContainer.lastChild);
+  }
+  addBotMessage('ಚಾಟ್ ಇತಿಹಾಸವನ್ನು ಸ್ಪಷ್ಟಗೊಳಿಸಲಾಗಿದೆ. ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?');
+}
+
+// Generate AI response based on user input
+function generateAIResponse(userMessage) {
+  const lowerMessage = userMessage.toLowerCase();
+  let response = '';
+
+  // Weather-related queries
+  if (lowerMessage.includes('ಹವಾಮಾನ') || lowerMessage.includes('ಮಳೆ') || lowerMessage.includes('ವಾತಾವರಣ')) {
+    response = 'ನಿಮ್ಮ ಪ್ರದೇಶದ ಪ್ರಸ್ತುತ ಹವಾಮಾನ: 28°C, ಸಾಧಾರಣ ತೇವಾಂಶ. ಮುಂದಿನ 3 ದಿನಗಳಲ್ಲಿ ಮಳೆಯ ಸಾಧ್ಯತೆ ಇದೆ. ಮುಂದಿನ 5 ದಿನಗಳ ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ: ಇಂದು - 28°C, ನಾಳೆ - 30°C, ನಂತರದ ದಿನ - 26°C, 4ನೇ ದಿನ - 29°C, 5ನೇ ದಿನ - 31°C.';
+  } 
+  // Simple response logic - in a real application, this would connect to an AI service
+  else if (lowerMessage.includes('ನಮಸ್ಕಾರ') || lowerMessage.includes('ಹಲೋ') || lowerMessage.includes('ಹೇ')) {
+    response = 'ನಮಸ್ಕಾರ! ನಾನು KrishiSiri AI ಸಹಾಯಕ. ನಿಮ್ಮ ಕೃಷಿ ಸಮಸ್ಯೆಗಳು, ಬೆಳೆ ಸಲಹೆ, ರೋಗ ನಿರ್ಣಯ, ಅಥವಾ ಹವಾಮಾನ ಮಾಹಿತಿಗಾಗಿ ನನಗೆ ಕೇಳಿ.';
+  } else if (lowerMessage.includes('ಬೆಳೆ') && lowerMessage.includes('ಸಲಹೆ')) {
+    response = 'ಬೆಳೆ ಶಿಫಾರಸುಗಳಿಗಾಗಿ, ನಿಮ್ಮ ಮಣ್ಣಿನ ಪ್ರಕಾರ, ಹವಾಮಾನ ಮತ್ತು ನೀರಿನ ಲಭ್ಯತೆಯನ್ನು ಪರಿಗಣಿಸಬೇಕು. ಕನ್ನಡ ಭಾಷೆಯಲ್ಲಿ ನಾನು ನಿಮಗೆ ಸಹಾಯ ಮಾಡಬಹುದು. ನಿಮ್ಮ ಪ್ರದೇಶ ಮತ್ತು ಮಣ್ಣಿನ ಬಗ್ಗೆ ಹೆಚ್ಚಿನ ವಿವರ ನೀಡಿ.';
+  } else if (lowerMessage.includes('ರೋಗ') || lowerMessage.includes('ಕೀಟ')) {
+    response = 'ಸಸ್ಯ ರೋಗಗಳು ಮತ್ತು ಕೀಟಗಳ ನಿಯಂತ್ರಣಕ್ಕಾಗಿ, ನೀವು ಸಸ್ಯದ ಚಿತ್ರವನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಬಹುದು. ನಾನು ರೋಗದ ಲಕ್ಷಣಗಳನ್ನು ಗುರುತಿಸಲು ಮತ್ತು ಸೂಕ್ತವಾದ ಚಿಕಿತ್ಸೆಯನ್ನು ಸೂಚಿಸಲು ಪ್ರಯತ್ನಿಸುತ್ತೇನೆ.';
+  } else if (lowerMessage.includes('ನೀರು') || lowerMessage.includes('ನೀರಾವರಿ')) {
+    response = 'ನೀರಾವರಿ ನಿರ್ವಹಣೆ ಕೃಷಿಯಲ್ಲಿ ಬಹಳ ಮುಖ್ಯ. ಟಪ್ಪಾವರಿ ವಿಧಾನವು 70% ನೀರು ಉಳಿತಾಯ ಮಾಡುತ್ತದೆ. ನಿಮ್ಮ ಬೆಳೆ ಮತ್ತು ಮಣ್ಣಿನ ಪ್ರಕಾರಕ್ಕೆ ಅನುಗುಣವಾದ ನೀರಾವರಿ ವಿಧಾನವನ್ನು ನಾನು ಸೂಚಿಸಬಹುದು.';
+  } else if (lowerMessage.includes('ಗೊಬ್ಬರ') || lowerMessage.includes('ಎರೆ')) {
+    response = 'ಗೊಬ್ಬರ ನಿರ್ವಹಣೆ ಬೆಳೆ ಉತ್ಪಾದನೆಯಲ್ಲಿ ಪ್ರಮುಖ ಪಾತ್ರ ವಹಿಸುತ್ತದೆ. ಸಾವಯವ ಗೊಬ್ಬರಗಳು ದೀರ್ಘಕಾಲೀನ ಮಣ್ಣಿನ ಆರೋಗ್ಯಕ್ಕೆ ಉತ್ತಮ. ನಿಮ್ಮ ಮಣ್ಣಿನ ಪರೀಕ್ಷೆಯ ಆಧಾರದ ಮೇಲೆ ಗೊಬ್ಬರದ ಶಿಫಾರಸುಗಳನ್ನು ನೀಡಬಹುದು.';
+  } else if (lowerMessage.includes('ಧನ್ಯವಾದ') || lowerMessage.includes('ಬೆನ್ನ')) {
+    response = 'ಧನ್ಯವಾದಗಳು! ನಿಮ್ಮ ಕೃಷಿ ಯಶಸ್ಸಿಗಾಗಿ ನಾನು ಯಾವಾಗಲೂ ಇಲ್ಲಿ ಇರುತ್ತೇನೆ. ಇನ್ನಷ್ಟು ಪ್ರಶ್ನೆಗಳಿದ್ದರೆ ಕೇಳಿ.';
+  } else {
+    response = 'ಕ್ಷಮಿಸಿ, ನಾನು ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲಿಲ್ಲ. ನೀವು ಬೆಳೆ ಸಲಹೆ, ಸಸ್ಯ ರೋಗಗಳು, ನೀರಾವರಿ, ಗೊಬ್ಬರ, ಅಥವಾ ಹವಾಮಾನದ ಬಗ್ಗೆ ಕೇಳಬಹುದು.';
+  }
+
+  addBotMessage(response);
+}
+
+// ========== AI VOICE: MULTI-LANGUAGE SUPPORT ==========
+
+// Keep only 2-letter language code here (page default = Kannada)
+let currentVoiceLanguage = 'kn'; 
+let voices = [];
+let speechSynthesis = window.speechSynthesis;
+
+// Comprehensive language mapping
+const languageMap = {
+  'kn': { code: 'kn-IN', name: 'ಕನ್ನಡ', voice: 'kn-IN' },
+  'en': { code: 'en-US', name: 'English', voice: 'en-US' },
+  'hi': { code: 'hi-IN', name: 'हिन्दी', voice: 'hi-IN' },
+  'ta': { code: 'ta-IN', name: 'தமிழ்', voice: 'ta-IN' },
+  'te': { code: 'te-IN', name: 'తెలుగు', voice: 'te-IN' },
+  'mr': { code: 'mr-IN', name: 'मराठी', voice: 'mr-IN' },
+  'bn': { code: 'bn-IN', name: 'বাংলা', voice: 'bn-IN' },
+  'gu': { code: 'gu-IN', name: 'ગુજરાતી', voice: 'gu-IN' },
+  'pa': { code: 'pa-IN', name: 'ਪੰਜਾਬੀ', voice: 'pa-IN' },
+  'ml': { code: 'ml-IN', name: 'മലയാളം', voice: 'ml-IN' },
+  'ur': { code: 'ur-PK', name: 'اردو', voice: 'ur-PK' }
+};
+
+// ---- Read target language from Google Translate cookie ----
+function getGoogleTargetLanguage() {
+  try {
+    const cookieEntry = document.cookie.split('; ').find(row => row.startsWith('googtrans='));
+    if (!cookieEntry) return null;
+
+    const cookieVal = decodeURIComponent(cookieEntry.split('=')[1]); // "/kn/en"
+    const parts = cookieVal.split('/').filter(Boolean);              // ["kn","en"]
+    if (parts.length === 0) return null;
+
+    // Last one = target language code
+    return parts[parts.length - 1].toLowerCase(); // "en"
+  } catch (e) {
+    return null;
+  }
+}
+
+// Update global language from Google Translate
+function updateVoiceLanguageFromTranslate() {
+  const target = getGoogleTargetLanguage();
+  if (target && languageMap[target]) {
+    currentVoiceLanguage = target;
+  }
+}
+
+// Also check every few seconds in case user changes language
+setInterval(updateVoiceLanguageFromTranslate, 3000);
+
+// ---- Load browser voices ----
+function loadVoices() {
+  voices = speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    setTimeout(loadVoices, 100);
+  }
+}
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+// ---- Toggle voice ON / OFF ----
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  const voiceToggle = document.getElementById('voiceToggle');
+  const voiceStatus = document.getElementById('voiceStatus');
+  
+  if (voiceEnabled) {
+    voiceToggle.classList.add('active');
+    voiceStatus.textContent = 'AI Voice: ON';
+    speakText('AI voice assistant enabled. Click on any element to hear its description.');
+  } else {
+    voiceToggle.classList.remove('active');
+    voiceStatus.textContent = 'AI Voice: OFF';
+    speechSynthesis.cancel();
+  }
+}
+
+// ---- Speak text using current translated language ----
+function speakText(text, specificLang = null) {
+  if (!voiceEnabled) return;
+
+  // Sync language with Google Translate if no specific language provided
+  if (!specificLang) {
+    updateVoiceLanguageFromTranslate();
+  }
+
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  const langCode = specificLang || currentVoiceLanguage;
+  const langInfo = languageMap[langCode] || languageMap['kn'];
+  
+  utterance.lang = langInfo.voice;
+  utterance.rate = 0.9;
+  utterance.pitch = 1.0;
+
+  // Find voices for the selected language
+  let candidateVoices = voices.filter(voice => {
+    const vLang = (voice.lang || '').toLowerCase();
+    return vLang.startsWith(langCode);
+  });
+
+  // Prefer female voices if available
+  let preferredVoices = candidateVoices.filter(voice =>
+    voice.name.toLowerCase().includes('female') ||
+    voice.name.toLowerCase().includes('google') ||
+    voice.name.toLowerCase().includes('samantha') ||
+    voice.name.toLowerCase().includes('karen') ||
+    voice.name.toLowerCase().includes('veena')
+  );
+
+  if (preferredVoices.length > 0) {
+    utterance.voice = preferredVoices[0];
+  } else if (candidateVoices.length > 0) {
+    utterance.voice = candidateVoices[0];
+  } else if (voices.length > 0) {
+    // Fallback: some voice at least
+    utterance.voice = voices[0];
+  }
+
+  speechSynthesis.speak(utterance);
+}
+
+// ---- Get text from element ----
+function getElementText(element) {
+  if (element.tagName === 'IMG') {
+    return element.alt || 'Image';
+  } else if (element.tagName === 'A') {
+    return element.textContent || 'Link';
+  } else if (element.tagName === 'BUTTON') {
+    return element.textContent || 'Button';
+  } else if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
+    return element.placeholder || element.name || 'Input field';
+  } else {
+    return element.textContent || element.innerText || 'Element';
+  }
+}
+
+// ---- Add click listeners for voice ----
+function addVoiceListeners() {
+  const interactiveElements = document.querySelectorAll(
+    'a, button, .home-btn, .buttonn, .word-card, .adv-card, ' +
+    '.weather-card, .box, .calendar-month, #cropSelect, #menu-btn'
+  );
+  
+  interactiveElements.forEach(element => {
+    element.addEventListener('click', function(e) {
+      if (!voiceEnabled) return;
+      e.stopPropagation();
+      const text = getElementText(this);
+      speakText(text);
+    });
+  });
+  
+  const headings = document.querySelectorAll('h1, h2, h3, h4');
+  headings.forEach(heading => {
+    heading.addEventListener('click', function() {
+      if (!voiceEnabled) return;
+      const text = getElementText(this);
+      speakText(text);
+    });
+  });
+}
+
+// ========== CROP CALENDAR ==========
+
+function updateCalendar() {
+  const crop = document.getElementById('cropSelect').value;
+  const calendarView = document.getElementById('calendarView');
+  
+  let sowingMonths = [];
+  let harvestingMonths = [];
+  
+  // Define sowing and harvesting months for each crop
+  if (crop === 'rice') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'ragi') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'jowar') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'maize') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'sugarcane') {
+    sowingMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ'];
+    harvestingMonths = ['ಡಿಸೆಂಬರ್', 'ಜನವರಿ'];
+  } else if (crop === 'cotton') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಡಿಸೆಂಬರ್', 'ಜನವರಿ'];
+  } else if (crop === 'groundnut') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'sunflower') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'chilli') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  } else if (crop === 'turmeric') {
+    sowingMonths = ['ಮೇ', 'ಜೂನ್'];
+    harvestingMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ'];
+  } else if (crop === 'onion') {
+    sowingMonths = ['ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್'];
+    harvestingMonths = ['ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್'];
+  } else if (crop === 'tomato') {
+    sowingMonths = ['ಜೂನ್', 'ಜುಲೈ'];
+    harvestingMonths = ['ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್'];
+  }
+  
+  let calendarHTML = '';
+  const allMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 
+                     'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
+  
+  allMonths.forEach(month => {
+    let className = '';
+    if (sowingMonths.includes(month)) {
+      className = 'sowing';
+    } else if (harvestingMonths.includes(month)) {
+      className = 'harvesting';
+    }
+    calendarHTML += `<div class="calendar-month ${className}">${month}</div>`;
+  });
+  
+  calendarView.innerHTML = calendarHTML;
+}
+
+// ========== REST OF YOUR ORIGINAL JS ==========
+
+// Toggle navbar on mobile
+function toggleNavbar() {
+  const navbar = document.getElementById('navbar');
+  navbar.classList.toggle('active');
+}
+
+// Google Translate Widget
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'kn',
+    includedLanguages: 'en,hi,kn,ta,te,mr,ml,gu,bn,pa,ur,as,or',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+// Add Google Translate script
+function addGoogleTranslateScript() {
+  const script = document.createElement('script');
+  script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  document.head.appendChild(script);
+}
+
+// Emergency Alerts
+function showEmergencyAlert(title, message) {
+  // Create alert element if it doesn't exist
+  let alertDiv = document.getElementById('emergencyAlert');
+  if (!alertDiv) {
+    alertDiv = document.createElement('div');
+    alertDiv.id = 'emergencyAlert';
+    alertDiv.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #e74c3c;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 2000;
+      display: none;
+      text-align: center;
+    `;
+    alertDiv.innerHTML = `
+      <h3 id="alertTitle"></h3>
+      <p id="alertMessage"></p>
+      <button onclick="closeEmergencyAlert()" style="margin-top: 10px; padding: 5px 15px; background: white; color: #e74c3c; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+    `;
+    document.body.appendChild(alertDiv);
+  }
+  
+  document.getElementById('alertTitle').textContent = title;
+  document.getElementById('alertMessage').textContent = message;
+  alertDiv.style.display = 'block';
+}
+
+function closeEmergencyAlert() {
+  const alertDiv = document.getElementById('emergencyAlert');
+  if (alertDiv) {
+    alertDiv.style.display = 'none';
+  }
+}
+
+// Simulate real-time data updates
+function updateRealTimeData() {
+  const temp = 25 + Math.floor(Math.random() * 10);
+  const moisture = 60 + Math.floor(Math.random() * 20);
+  const price = 2400 + Math.floor(Math.random() * 200);
+  // (elements commented in original code)
+}
+
+// Simulate emergency alert (for demo)
+function simulateEmergencyAlert() {
+  const alerts = [
+    {title: 'ಹವಾಮಾನ ಎಚ್ಚರಿಕೆ', message: 'ಕಡಿಮೆ ವರ್ಷಪಾತದ ಎಚ್ಚರಿಕೆ. ನೀರಿನ ಬಳಕೆಯನ್ನು ಜಾಗರೂಕರಾಗಿ ನಿರ್ವಹಿಸಿ.'},
+    {title: 'ರೋಗ ಎಚ್ಚರಿಕೆ', message: 'ನಿಮ್ಮ ಪ್ರದೇಶದಲ್ಲಿ ಸಸ್ಯ ರೋಗದ ಪ್ರಸರಣ ವರದಿಯಾಗಿದೆ. ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.'},
+    {title: 'ಬೆಳೆ ಬೆಲೆ ಎಚ್ಚರಿಕೆ', message: 'ಭತ್ತ ಬೆಲೆಗಳು ಕುಸಿದಿವೆ. ಮಾರುಕಟ್ಟೆ ಪರಿಸ್ಥಿತಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.'}
+  ];
+  
+  const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+  showEmergencyAlert(randomAlert.title, randomAlert.message);
+}
+
+// Page load event
+window.addEventListener('load', function() {
+  // Add Google Translate
+  addGoogleTranslateScript();
+  
+  // Initialize crop calendar
+  updateCalendar();
+  
+  // Add voice listeners
+  addVoiceListeners();
+  
+  // Add event listener to voice toggle button
+  document.getElementById('voiceToggle').addEventListener('click', toggleVoice);
+  
+  // Initialize chatbot
+  initChatbot();
+  
+  // Hide loader
+  document.getElementById('pageLoader').style.display = 'none';
+  
+  // Start real-time data updates
+  setInterval(updateRealTimeData, 5000);
+  
+  // Add scroll animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-fadeInUp');
+      }
+    });
+  }, observerOptions);
+  
+  // Observe all sections
+  document.querySelectorAll('section').forEach(section => {
+    observer.observe(section);
+  });
+});
+
+// Show loader when page is loading
+document.getElementById('pageLoader').style.display = 'block';
+
+// Close navbar when clicking on a link (for mobile)
+document.querySelectorAll('.navbar a').forEach(link => {
+  link.addEventListener('click', () => {
+    const navbar = document.getElementById('navbar');
+    if (navbar.classList.contains('active')) {
+      navbar.classList.remove('active');
+    }
+  });
+});
+</script>
+
+</body>
+</html>

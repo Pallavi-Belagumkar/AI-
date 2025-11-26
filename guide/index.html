@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart Farming Guide - Crop Selection</title>
+<style>
+  :root {
+    --primary-green: #2E7D32;
+    --secondary-green: #4CAF50;
+    --light-green: #E8F5E9;
+    --accent-orange: #FFA726;
+    --text-dark: #333;
+    --text-light: #666;
+    --white: #FFFFFF;
+    --shadow: 0 8px 32px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --transition: all 0.3s ease;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(rgba(34,139,34,0.15), rgba(144,238,144,0.15)),
+      url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+    background-size: cover;
+    padding: 20px;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .hero {
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 50%, #66BB6A 100%);
+    color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(46,125,50,0.25);
+    padding: 40px 20px 30px;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero h1 {
+    font-weight: 700;
+    font-size: clamp(1.8em, 4vw, 2.3em);
+    letter-spacing: 1.5px;
+    margin: 0 0 18px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.18);
+  }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 1000;
+  }
+
+  .dropbtn {
+    background: linear-gradient(135deg, var(--accent-orange) 0%, #FF6F00 100%);
+    border: none;
+    border-radius: 30px;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 16px;
+    padding: 14px 36px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255,167,38,0.38);
+    transition: var(--transition);
+    z-index: 1001;
+  }
+
+  .dropbtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(255,167,38,0.5);
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.16);
+    max-height: 420px;
+    overflow-y: auto;
+    min-width: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1002;
+    margin-top: 10px;
+    scroll-behavior: smooth;
+  }
+
+  .dropdown-content a {
+    display: block;
+    padding: 12px 20px;
+    font-size: 15px;
+    color: var(--text-dark);
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    transition: var(--transition);
+  }
+
+  .dropdown-content a:hover {
+    background: linear-gradient(90deg, var(--light-green) 0%, #C8E6C9 100%);
+    padding-left: 28px;
+    color: #388E3C;
+    font-weight: 600;
+  }
+
+  .show {
+    display: block;
+    animation: slideDown 0.3s ease forwards;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) scaleY(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) scaleY(1);
+    }
+  }
+
+  .crop-info {
+    display: none;
+    margin-top: 30px;
+    padding: 28px;
+    background: linear-gradient(135deg, #F1F8F4 0%, var(--light-green) 100%);
+    border-left: 6px solid var(--secondary-green);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.09);
+    animation: fadeIn 0.35s ease forwards;
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .crop-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: flex-start;
+  }
+
+  .crop-image {
+    flex: 1 1 320px;
+    max-width: 320px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  }
+
+  .crop-image img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform 0.28s ease;
+  }
+
+  .crop-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .crop-text {
+    flex: 2 1 400px;
+  }
+
+  .crop-text h3 {
+    font-size: 1.7em;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    color: var(--primary-green);
+  }
+
+  .crop-text p {
+    margin-bottom: 18px;
+    line-height: 1.65;
+    color: var(--text-dark);
+    font-size: 16px;
+  }
+
+  .crop-text h4 {
+    margin-bottom: 12px;
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #388E3C;
+  }
+
+  .crop-text ul {
+    margin-left: 22px;
+  }
+
+  .crop-text li {
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-light);
+  }
+
+  .search-container {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    z-index: 1003;
+  }
+
+  .search-container input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition);
+  }
+
+  .search-container input:focus {
+    border-color: var(--secondary-green);
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+  }
+
+  @media (max-width: 780px) {
+    .crop-details {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .crop-image, .crop-text {
+      max-width: 100%;
+      flex: 1 1 100%;
+    }
+    
+    .crop-image img {
+      height: 180px;
+    }
+    
+    .container {
+      padding: 20px 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding: 10px;
+    }
+    
+    .hero {
+      padding: 30px 15px 20px;
+    }
+    
+    .dropbtn {
+      padding: 12px 24px;
+      font-size: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="hero">
+    <h1>🌾 SMART FARMING GUIDE 🌾</h1>
+    
+    <div class="dropdown">
+      <button class="dropbtn" onclick="toggleDropdown()">🌱 Select Crop</button>
+      <div id="dropdownContent" class="dropdown-content">
+        <div class="search-container">
+          <input type="text" id="cropSearch" placeholder="Search for crops..." onkeyup="filterCrops()">
+        </div>
+        <a href="#" onclick="showCrop('apple')">🍎 Apple</a>
+        <a href="#" onclick="showCrop('banana')">🍌 Banana</a>
+        <a href="#" onclick="showCrop('barley')">🌾 Barley</a>
+        <a href="#" onclick="showCrop('cabbage')">🥬 Cabbage</a>
+        <a href="#" onclick="showCrop('carrot')">🥕 Carrot</a>
+        <a href="#" onclick="showCrop('cauliflower')">🥦 Cauliflower</a>
+        <a href="#" onclick="showCrop('coffee')">☕ Coffee</a>
+        <a href="#" onclick="showCrop('coconut')">🥥 Coconut</a>
+        <a href="#" onclick="showCrop('corn')">🌽 Corn</a>
+        <a href="#" onclick="showCrop('cotton')">🧵 Cotton</a>
+        <a href="#" onclick="showCrop('cucumber')">🥒 Cucumber</a>
+        <a href="#" onclick="showCrop('grapes')">🍇 Grapes</a>
+        <a href="#" onclick="showCrop('groundnut')">🥜 Groundnut</a>
+        <a href="#" onclick="showCrop('jute')">🌿 Jute</a>
+        <a href="#" onclick="showCrop('kidneybeans')">🫘 Kidney beans</a>
+        <a href="#" onclick="showCrop('lentil')">🫘 Lentil</a>
+        <a href="#" onclick="showCrop('maize')">🌽 Maize</a>
+        <a href="#" onclick="showCrop('mango')">🥭 Mango</a>
+        <a href="#" onclick="showCrop('millet')">🌾 Millet</a>
+        <a href="#" onclick="showCrop('mungbean')">🫛 Mung bean</a>
+        <a href="#" onclick="showCrop('mushroom')">🍄 Mushroom</a>
+        <a href="#" onclick="showCrop('mustard')">🌻 Mustard</a>
+        <a href="#" onclick="showCrop('onion')">🧅 Onion</a>
+        <a href="#" onclick="showCrop('orange')">🍊 Orange</a>
+        <a href="#" onclick="showCrop('papaya')">🍈 Papaya</a>
+        <a href="#" onclick="showCrop('peas')">🫛 Peas</a>
+        <a href="#" onclick="showCrop('pigeonpeas')">🫛 Pigeon peas</a>
+        <a href="#" onclick="showCrop('pomegranate')">🍒 Pomegranate</a>
+        <a href="#" onclick="showCrop('potato')">🥔 Potato</a>
+        <a href="#" onclick="showCrop('rice')">🍚 Rice</a>
+        <a href="#" onclick="showCrop('soybean')">🫘 Soybean</a>
+        <a href="#" onclick="showCrop('sugarcane')">🎍 Sugarcane</a>
+        <a href="#" onclick="showCrop('sunflower')">🌻 Sunflower</a>
+        <a href="#" onclick="showCrop('tea')">🍵 Tea</a>
+        <a href="#" onclick="showCrop('tomato')">🍅 Tomato</a>
+        <a href="#" onclick="showCrop('watermelon')">🍉 Watermelon</a>
+        <a href="#" onclick="showCrop('wheat')">🌾 Wheat</a>
+        <a href="#" onclick="showCrop('spinach')">🥬 Spinach</a>
+        <a href="#" onclick="showCrop('beetroot')">🧄 Beetroot</a>
+        <a href="#" onclick="showCrop('peanut')">🥜 Peanut</a>
+        <a href="#" onclick="showCrop('sweetpotato')">🍠 Sweet Potato</a>
+      </div>
+    </div>
+  </header>
+  
+  <div id="cropInfo" class="crop-info"></div>
+</div>
+
+<script>
+  const CropData = {
+    apple: {
+      name: "Apple",
+      image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500&h=350&fit=crop",
+      description: "Apples grow best in temperate, cold-winter climates with well-drained loamy soil.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.5-6.5",
+        "Temperature: 21-24°C during growing season",
+        "Rainfall: 100-125 cm annually",
+        "Harvest: 4-5 years after planting"
+      ]
+    },
+    banana: {
+      name: "Banana",
+      image: "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=500&h=350&fit=crop",
+      description: "Bananas thrive in warm, humid tropical conditions with rich soil.",
+      requirements: [
+        "Soil: Rich, well-drained soil with pH 5.5-7.0",
+        "Temperature: 26-30°C",
+        "Rainfall: 200-250 cm annually",
+        "Harvest: 9-12 months after planting"
+      ]
+    },
+    barley: {
+      name: "Barley",
+      image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=500&h=350&fit=crop",
+      description: "Barley is a versatile cereal grain that grows well in cool climates.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 15-20°C during growing season",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 3-4 months after planting"
+      ]
+    },
+    cabbage: {
+      name: "Cabbage",
+      image: "https://tse1.mm.bing.net/th/id/OIP.QIQ82TGE01mtEO-x2SJwWwHaE6?rs=1&pid=ImgDetMain&o=7&rm=3",
+      description: "Cabbage is a nutritious leafy vegetable that forms compact heads.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-6.5",
+        "Temperature: 15-20°C",
+        "Rainfall: 35-50 cm annually",
+        "Harvest: 70-120 days after planting"
+      ]
+    },
+    carrot: {
+      name: "Carrot",
+      image: "https://images.unsplash.com/photo-1582515073490-39981397c445?w=500&h=350&fit=crop",
+      description: "Carrots prefer cool climates and loose, sandy soils for proper root development.",
+      requirements: [
+        "Soil: Deep, loose sandy loam with pH 6.0-6.8",
+        "Temperature: 15-20°C",
+        "Rainfall: 50-100 cm annually",
+        "Harvest: 70-80 days after planting"
+      ]
+    },
+    cauliflower: {
+      name: "Cauliflower",
+      image: "https://cdn.pixabay.com/photo/2022/01/19/08/46/cauliflower-6949190_960_720.jpg",
+      description: "Cauliflower is a cool-season vegetable that produces edible white flower heads.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.0",
+        "Temperature: 15-22°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 90-120 days after planting"
+      ]
+    },
+    coffee: {
+      name: "Coffee",
+      image: "https://as2.ftcdn.net/v2/jpg/07/27/59/79/1000_F_727597985_kz3FQbl70LhHv7TeqRntAs0mvGMqhEnF.jpg",
+      description: "Coffee plants thrive in tropical highland conditions with volcanic soil.",
+      requirements: [
+        "Soil: Volcanic, well-drained soil with pH 6.0-6.5",
+        "Temperature: 15-24°C",
+        "Rainfall: 150-250 cm annually",
+        "Harvest: 3-4 years after planting"
+      ]
+    },
+    coconut: {
+      name: "Coconut",
+      image: "https://tse1.mm.bing.net/th/id/OIP.OaqXdOj3Gae7idmSB9od4AHaFj?rs=1&pid=ImgDetMain&o=7&rm=3",
+      description: "Coconut palms grow in tropical coastal regions with sandy soil.",
+      requirements: [
+        "Soil: Sandy, well-drained soil with pH 5.0-8.0",
+        "Temperature: 27-30°C",
+        "Rainfall: 150-250 cm annually",
+        "Harvest: 6-10 years after planting"
+      ]
+    },
+    corn: {
+      name: "Corn",
+      image: "https://as1.ftcdn.net/v2/jpg/05/43/33/90/1000_F_543339060_47tywFrfEyj9NdrZEw0DVxDSnBPHw5Jn.jpg",
+      description: "Corn is a warm-season cereal grain that requires plenty of sunlight.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.8-7.0",
+        "Temperature: 18-27°C",
+        "Rainfall: 60-110 cm annually",
+        "Harvest: 3-4 months after planting"
+      ]
+    },
+    cotton: {
+      name: "Cotton",
+      image: "https://i.pinimg.com/originals/1b/3c/3d/1b3c3dbe78742a419bdae65e0c672abb.jpg",
+      description: "Cotton is grown for its soft, fluffy fiber used in textiles.",
+      requirements: [
+        "Soil: Well-drained black soil with pH 6.0-8.0",
+        "Temperature: 21-30°C",
+        "Rainfall: 50-100 cm annually",
+        "Harvest: 5-6 months after planting"
+      ]
+    },
+    cucumber: {
+      name: "Cucumber",
+      image: "https://gardenerspath.com/wp-content/uploads/2021/05/Types-of-Cucumbers-FB.jpg",
+      description: "Cucumbers are creeping vine plants that produce cylindrical fruits.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 6.0-7.0",
+        "Temperature: 18-27°C",
+        "Rainfall: 70-150 cm annually",
+        "Harvest: 50-70 days after planting"
+      ]
+    },
+    grapes: {
+      name: "Grapes",
+      image: "https://www.housedigest.com/img/gallery/everything-you-need-to-know-about-growing-your-own-grapes/l-intro-1658108302.jpg",
+      description: "Grapes grow on woody vines and are used for fresh eating and winemaking.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.5-6.5",
+        "Temperature: 15-35°C",
+        "Rainfall: 50-150 cm annually",
+        "Harvest: 1-3 years after planting"
+      ]
+    },
+    groundnut: {
+      name: "Groundnut",
+      image: "https://agriguru.in/wp-content/uploads/2025/04/Groundnut-Cultivation-Guide-Best-Practices-Tips-Techniques-for-High-Yield-2.jpg",
+      description: "Groundnuts, also known as peanuts, are legumes grown for edible seeds.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 5.5-7.0",
+        "Temperature: 25-30°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 90-120 days after planting"
+      ]
+    },
+    jute: {
+      name: "Jute",
+      image: "https://img.freepik.com/premium-photo/green-jute-plantation-field-raw-jute-plant-texture-background_656518-197.jpg?w=2000",
+      description: "Jute is a long, soft vegetable fiber used for making ropes and textiles.",
+      requirements: [
+        "Soil: Alluvial loamy soil with pH 6.0-7.5",
+        "Temperature: 24-37°C",
+        "Rainfall: 150-250 cm annually",
+        "Harvest: 120-150 days after planting"
+      ]
+    },
+    kidneybeans: {
+      name: "Kidney Beans",
+      image: "https://5.imimg.com/data5/KQ/YP/MY-32438742/kidney-beans-500x500.jpg",
+      description: "Kidney beans are nutritious legumes named for their kidney-like shape.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.0",
+        "Temperature: 15-27°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 90-140 days after planting"
+      ]
+    },
+    lentil: {
+      name: "Lentil",
+      image: "https://img2.exportersindia.com/product_images/bc-full/dir_167/4984396/masoor-dal-seeds-1521632285-3737827.jpeg",
+      description: "Lentils are protein-rich legumes with lens-shaped seeds.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.0",
+        "Temperature: 18-30°C",
+        "Rainfall: 35-50 cm annually",
+        "Harvest: 80-110 days after planting"
+      ]
+    },
+    maize: {
+      name: "Maize",
+      image: "https://www.healthbenefitstimes.com/glossary/wp-content/uploads/2020/10/Maize.jpg",
+      description: "Maize, also known as corn, is a staple cereal grain worldwide.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.8-7.0",
+        "Temperature: 18-27°C",
+        "Rainfall: 60-110 cm annually",
+        "Harvest: 3-4 months after planting"
+      ]
+    },
+    mango: {
+      name: "Mango",
+      image: "https://i.etsystatic.com/16687927/c/1200/952/0/10/il/c9fe6b/1677165763/il_340x270.1677165763_2n9a.jpg",
+      description: "Mango is a tropical stone fruit known as the 'king of fruits'.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.5-7.5",
+        "Temperature: 24-30°C",
+        "Rainfall: 75-250 cm annually",
+        "Harvest: 4-6 years after planting"
+      ]
+    },
+    millet: {
+      name: "Millet",
+      image: "https://about.spud.com/wrdp/wp-content/uploads/2017/04/shutterstock_394245172.jpg",
+      description: "Millet is a group of small-seeded grasses grown as cereal crops.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 25-35°C",
+        "Rainfall: 40-60 cm annually",
+        "Harvest: 70-90 days after planting"
+      ]
+    },
+    mungbean: {
+      name: "Mung Bean",
+      image: "https://usercontent2.hubstatic.com/13136331_f496.jpg",
+      description: "Mung beans are legumes cultivated for their edible seeds and sprouts.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 6.2-7.2",
+        "Temperature: 25-35°C",
+        "Rainfall: 60-90 cm annually",
+        "Harvest: 90-120 days after planting"
+      ]
+    },
+    mushroom: {
+      name: "Mushroom",
+      image: "https://tse1.explicit.bing.net/th/id/OIP.RCGZBy5qvceF9LZzLWdLPQHaF-?rs=1&pid=ImgDetMain&o=7&rm=3",
+      description: "Mushrooms are fungi cultivated in controlled environments.",
+      requirements: [
+        "Growing Medium: Composted organic material",
+        "Temperature: 15-25°C depending on species",
+        "Humidity: 80-90%",
+        "Harvest: 3-4 weeks after spawning"
+      ]
+    },
+    mustard: {
+      name: "Mustard",
+      image: "https://gardenerspath.com/wp-content/uploads/2020/10/How-to-Grow-Mustard-Greens-FB.jpg",
+      description: "Mustard plants are grown for seeds used as spice and for oil production.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 10-25°C",
+        "Rainfall: 35-50 cm annually",
+        "Harvest: 90-120 days after planting"
+      ]
+    },
+    onion: {
+      name: "Onion",
+      image: "https://www.marthastewart.com/thmb/NWo0ZWxZGPcj2dm7VhZ9fwjkqis=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1363298145-fd8bca5cdaef489fab975b0982290b2d.jpg",
+      description: "Onions are bulb vegetables with distinctive flavor and aroma.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 6.0-7.0",
+        "Temperature: 13-24°C",
+        "Rainfall: 50-100 cm annually",
+        "Harvest: 90-150 days after planting"
+      ]
+    },
+    orange: {
+      name: "Orange",
+      image: "https://images.unsplash.com/photo-1547514701-42782101795e?w=500&h=350&fit=crop",
+      description: "Oranges are citrus fruits rich in vitamin C and sweet flavor.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 15-30°C",
+        "Rainfall: 100-150 cm annually",
+        "Harvest: 3-4 years after planting"
+      ]
+    },
+    papaya: {
+      name: "Papaya",
+      image: "https://www.gardeningknowhow.com/wp-content/uploads/2020/05/papaya.jpg",
+      description: "Papaya is a tropical fruit with sweet taste and digestive enzymes.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 6.0-6.5",
+        "Temperature: 21-33°C",
+        "Rainfall: 100-150 cm annually",
+        "Harvest: 9-11 months after planting"
+      ]
+    },
+    peas: {
+      name: "Peas",
+      image: "https://tse1&pid=ImgDetMain&o=7&rm=3",
+      description: "Peas are cool-season vegetables that produce pods with edible seeds.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 10-22°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 60-70 days after planting"
+      ]
+    },
+    pigeonpeas: {
+      name: "Pigeon Peas",
+      image: "https://5.imimg.com/data5/SELLER/Default/2022/2/PR/NP/VT/47919708/arhar-pegion-pea-seeds-1000x1000.jpg",
+      description: "Pigeon peas are perennial legumes grown in tropical regions.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.0-7.0",
+        "Temperature: 25-35°C",
+        "Rainfall: 60-140 cm annually",
+        "Harvest: 120-180 days after planting"
+      ]
+    },
+    pomegranate: {
+      name: "Pomegranate",
+      image: "https://www.thespruce.com/thmb/7CaieclZ-VI2KZNRqJAk-DJMuq4=/3658x2442/filters:no_upscale():max_bytes(150000):strip_icc()/pomegranate-growing-tips-3269232-04-486bb88091ad445b98bfd08ca2e2ebd1.jpg",
+      description: "Pomegranate produces jewel-like seeds called arils.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 5.5-7.0",
+        "Temperature: 25-35°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 3-4 years after planting"
+      ]
+    },
+    potato: {
+      name: "Potato",
+      image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=500&h=350&fit=crop",
+      description: "Potatoes are starchy tuber vegetables and a global staple food.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 5.0-6.5",
+        "Temperature: 15-20°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 3-4 months after planting"
+      ]
+    },
+    rice: {
+      name: "Rice",
+      image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&h=350&fit=crop",
+      description: "Rice is a staple food for over half the world's population.",
+      requirements: [
+        "Soil: Clayey or loamy soil with pH 5.0-6.5",
+        "Temperature: 20-35°C",
+        "Rainfall: 150-300 cm annually",
+        "Harvest: 3-6 months depending on variety"
+      ]
+    },
+    soybean: {
+      name: "Soybean",
+      image: "https://www.worldatlas.com/r/w1200/upload/0f/a8/01/shutterstock-1467898517.jpg",
+      description: "Soybeans are protein-rich legumes with numerous uses.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-6.8",
+        "Temperature: 20-30°C",
+        "Rainfall: 45-65 cm annually",
+        "Harvest: 80-120 days after planting"
+      ]
+    },
+    sugarcane: {
+      name: "Sugarcane",
+      image: "https://images.unsplash.com/photo-1615485500608-0c0d187e8758?w=500&h=350&fit=crop",
+      description: "Sugarcane is a tall grass cultivated for sugar production.",
+      requirements: [
+        "Soil: Deep, well-drained loamy soil with pH 6.5-7.5",
+        "Temperature: 20-30°C",
+        "Rainfall: 150-200 cm annually",
+        "Harvest: 10-24 months after planting"
+      ]
+    },
+    sunflower: {
+      name: "Sunflower",
+      image: "https://tse4.mm.bing.net/th/id/OIP.LGY8GmgL_csnw8UMAeZ8VQHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+      description: "Sunflower is grown for edible oil and seeds.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 18-25°C",
+        "Rainfall: 60-150 cm annually",
+        "Harvest: 70-100 days"
+      ]
+    },
+    tea: {
+      name: "Tea",
+      image: "https://www.zojirushi.com/blog/wp-content/uploads/2022/03/446319_l-scaled.jpg",
+      description: "Tea plants require specific climatic conditions for optimal growth.",
+      requirements: [
+        "Soil: Well-drained, acidic soil with pH 4.5-5.5",
+        "Temperature: 15-30°C",
+        "Rainfall: 150-200 cm annually",
+        "Harvest: 3-4 years after planting"
+      ]
+    },
+    tomato: {
+      name: "Tomato",
+      image: "https://cdn.mos.cms.futurecdn.net/6Bw7TvepqUdmiKMpHXTWCf.jpg",
+      description: "Tomato is a widely consumed fruit vegetable.",
+      requirements: [
+        "Soil: Sandy loam, pH 6.0-7.0",
+        "Temperature: 21-24°C",
+        "Rainfall: 60-80 cm",
+        "Harvest: 60-80 days"
+      ]
+    },
+    watermelon: {
+      name: "Watermelon",
+      image: "https://tse1.mm.bing.net/th/id/OIP.CUV2PccZhMe4XWnVtsscvwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+      description: "Watermelon is a large, sweet fruit perfect for hot climates.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 6.0-6.8",
+        "Temperature: 25-30°C",
+        "Rainfall: 50-100 cm annually",
+        "Harvest: 80-100 days after planting"
+      ]
+    },
+    wheat: {
+      name: "Wheat",
+      image: "https://tiimg.tistatic.com/fp/2/006/910/adulteration-free-100-natural-wheat-049.jpg",
+      description: "Wheat is a cereal grain and staple food worldwide.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.0-7.5",
+        "Temperature: 15-20°C during growing season",
+        "Rainfall: 50-100 cm annually",
+        "Harvest: 3-4 months after planting"
+      ]
+    },
+    spinach: {
+      name: "Spinach",
+      image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=500&h=350&fit=crop",
+      description: "Spinach is a nutrient-rich leafy green vegetable.",
+      requirements: [
+        "Soil: Well-drained loamy soil with pH 6.5-7.0",
+        "Temperature: 15-20°C",
+        "Rainfall: 30-50 cm annually",
+        "Harvest: 40-50 days after planting"
+      ]
+    },
+    beetroot: {
+      name: "Beetroot",
+      image: "https://w7.pngwing.com/pngs/247/848/png-transparent-sugar-beet-organic-food-beetroot-vegetable-beet-food-blueberry-fruit.png",
+      description: "Beetroot is a root vegetable known for its deep red color.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 6.0-7.0",
+        "Temperature: 15-18°C",
+        "Rainfall: 40-60 cm annually",
+        "Harvest: 55-70 days after planting"
+      ]
+    },
+    peanut: {
+      name: "Peanut",
+      image: "https://tse1.mm.bing.net/th/id/OIP.mqUcmVe15REExLZlVQJY4QHaE7?rs=1&pid=ImgDetMain&o=7&rm=3",
+      description: "Peanuts are legumes that develop underground.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 5.8-6.2",
+        "Temperature: 25-30°C",
+        "Rainfall: 50-75 cm annually",
+        "Harvest: 120-150 days after planting"
+      ]
+    },
+    sweetpotato: {
+      name: "Sweet Potato",
+      image: "https://cdn.shopify.com/s/files/1/0068/0394/7579/files/3825741_s_600x600.jpg?v=1705642137",
+      description: "Sweet potatoes are nutritious root vegetables.",
+      requirements: [
+        "Soil: Well-drained sandy loam with pH 5.5-6.5",
+        "Temperature: 21-26°C",
+        "Rainfall: 75-100 cm annually",
+        "Harvest: 90-120 days after planting"
+      ]
+    }
+  };
+
+  function toggleDropdown() {
+    document.getElementById("dropdownContent").classList.toggle("show");
+  }
+
+  window.addEventListener("click", (e) => {
+    if (!e.target.matches('.dropbtn') && !e.target.matches('.search-container') && !e.target.matches('.search-container input')) {
+      const dropdown = document.getElementById("dropdownContent");
+      if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      }
+    }
+  });
+
+  function showCrop(cropKey) {
+    const crop = CropData[cropKey];
+    if (!crop) {
+      alert("Crop information not available yet!");
+      return;
+    }
+    const cropInfo = document.getElementById("cropInfo");
+    cropInfo.style.display = 'block';
+    cropInfo.innerHTML = `
+      <div class="crop-details">
+        <div class="crop-image">
+          <img src="${crop.image}" alt="${crop.name}" loading="lazy" />
+        </div>
+        <div class="crop-text">
+          <h3>${crop.name}</h3>
+          <p>${crop.description}</p>
+          <h4>Requirements:</h4>
+          <ul>${crop.requirements.map(i => `<li>${i}</li>`).join('')}</ul>
+        </div>
+      </div>`;
+    cropInfo.scrollIntoView({ behavior: 'smooth' });
+    
+    // Close the dropdown after selection
+    document.getElementById("dropdownContent").classList.remove("show");
+  }
+
+  function filterCrops() {
+    const input = document.getElementById("cropSearch");
+    const filter = input.value.toUpperCase();
+    const dropdown = document.getElementById("dropdownContent");
+    const links = dropdown.getElementsByTagName("a");
+    
+    for (let i = 0; i < links.length; i++) {
+      const txtValue = links[i].textContent || links[i].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        links[i].style.display = "";
+      } else {
+        links[i].style.display = "none";
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
